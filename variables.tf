@@ -34,6 +34,11 @@ variable "create_lambda_function_url" {
   default     = false
 }
 
+variable "environment" {
+  description = "The environment to deploy to"
+  type = string
+}
+
 variable "putin_khuylo" {
   description = "Do you agree that Putin doesn't respect Ukrainian sovereignty and territorial integrity? More info: https://en.wikipedia.org/wiki/Putin_khuylo!"
   type        = bool
@@ -50,8 +55,8 @@ variable "lambda_at_edge" {
   default     = false
 }
 
-variable "function_name" {
-  description = "A unique name for your Lambda Function"
+variable "name" {
+  description = "The name prefix of all the resources"
   type        = string
   default     = ""
 }
@@ -65,8 +70,7 @@ variable "handler" {
 variable "runtime" {
   description = "Lambda Function runtime"
   type        = string
-  default     = ""
-
+  default     = "nodejs14.x"
   #  validation {
   #    condition     = can(var.create && contains(["nodejs10.x", "nodejs12.x", "java8", "java11", "python2.7", " python3.6", "python3.7", "python3.8", "dotnetcore2.1", "dotnetcore3.1", "go1.x", "ruby2.5", "ruby2.7", "provided"], var.runtime))
   #    error_message = "The runtime value must be one of supported by AWS Lambda."
@@ -368,7 +372,7 @@ variable "use_existing_cloudwatch_log_group" {
 variable "cloudwatch_logs_retention_in_days" {
   description = "Specifies the number of days you want to retain log events in the specified log group. Possible values are: 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653."
   type        = number
-  default     = null
+  default     = 90
 }
 
 variable "cloudwatch_logs_kms_key_id" {

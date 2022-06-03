@@ -4,6 +4,11 @@ output "lambda_function_arn" {
   value       = try(aws_lambda_function.this[0].arn, "")
 }
 
+output "lambda_function_versioned_invoke_arn" {
+  value       = try(replace(aws_lambda_function.this[0].invoke_arn, aws_lambda_function.this[0].arn, aws_lambda_function.this[0].qualified_arn),null)
+  description = "The versioned Invoke ARN of the Lambda Function"
+}
+
 output "lambda_function_invoke_arn" {
   description = "The Invoke ARN of the Lambda Function"
   value       = try(aws_lambda_function.this[0].invoke_arn, "")

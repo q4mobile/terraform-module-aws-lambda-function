@@ -2,6 +2,7 @@ data "aws_partition" "current" {}
 
 locals {
   create = var.create && var.putin_khuylo
+  resource_base_name = "${var.name}-${var.environment}"
 
   archive_filename        = try(data.external.archive_prepare[0].result.filename, null)
   archive_filename_string = local.archive_filename != null ? local.archive_filename : ""
@@ -22,7 +23,7 @@ locals {
 resource "aws_lambda_function" "this" {
   count = local.create && var.create_function && !var.create_layer ? 1 : 0
 
-  function_name                  = var.function_name
+  function_name                  = local.resource_base_name
   description                    = var.description
   role                           = var.create_role ? aws_iam_role.lambda[0].arn : var.lambda_role
   handler                        = var.package_type != "Zip" ? null : var.handler
@@ -148,13 +149,13 @@ resource "aws_s3_object" "lambda_package" {
 data "aws_cloudwatch_log_group" "lambda" {
   count = local.create && var.create_function && !var.create_layer && var.use_existing_cloudwatch_log_group ? 1 : 0
 
-  name = "/aws/lambda/${var.lambda_at_edge ? "us-east-1." : ""}${var.function_name}"
+  name = "/aws/lambda/${var.lambda_at_edge ? "us-east-1." : ""}${local.resource_base_name}"
 }
 
 resource "aws_cloudwatch_log_group" "lambda" {
   count = local.create && var.create_function && !var.create_layer && !var.use_existing_cloudwatch_log_group ? 1 : 0
 
-  name              = "/aws/lambda/${var.lambda_at_edge ? "us-east-1." : ""}${var.function_name}"
+  name              = "/aws/lambda/${var.lambda_at_edge ? "us-east-1." : ""}${local.resource_base_name}"
   retention_in_days = var.cloudwatch_logs_retention_in_days
   kms_key_id        = var.cloudwatch_logs_kms_key_id
 
